@@ -1,0 +1,11 @@
+<devices>
+    <device>
+        <jar>C:\Programming\Work\DALs\Crestron-RoomBookingPanel\target\insight-dal-crestron-roombookingpanel-1.0.jar</jar>
+        <deviceClassName>com.insightsystems.dal.crestron.RoomBookingPanel</deviceClassName>
+        <properties>
+            <property name="host">10.217.64.46</property>
+			<property name="login">admin</property>
+			<property name="password">19881988</property>
+        </properties>
+    </device>
+</devices>
