@@ -21,6 +21,8 @@ public class RoomBookingPanel extends RestCommunicator implements Monitorable, P
 
     @Override
     protected void authenticate() throws Exception {
+        if (this.logger.isDebugEnabled())
+            this.logger.debug("Attempting login with credentials [User: " + getLogin() + " Password: "+ getPassword() + "]");
         doPost("userlogin.html", "login=" + getLogin() + "&passwd=" + getPassword());
         //if password is correct, response with be status 200 and there will be set-cookie headers with session tokens etc.
     }
@@ -55,6 +57,9 @@ public class RoomBookingPanel extends RestCommunicator implements Monitorable, P
         } catch (Exception e) {
             //If error is code 403 session token is expired or non existent
             if (e.getCause().toString().contains("403 Forbidden")) {
+                if (this.logger.isDebugEnabled())
+                    this.logger.debug("403 Error Response received from device. Session token expired or credentials incorrect.");
+
                 this.authenticate();
                 //Attempt to get data again, this time not catching exceptions as device should be authenticated.
                 devResponse = doGet("Device/SchedulingPanel/Monitoring");
@@ -132,15 +137,15 @@ public class RoomBookingPanel extends RestCommunicator implements Monitorable, P
 
         if (controllableProperty.getProperty().equalsIgnoreCase("reboot")) {
             String response = doPost("Device/DeviceOperations", "{\"Device\":{\"DeviceOperations\":{\"Reboot\":true}}}"); //send reboot command to the devices
-            if (!response.contains("OK")){
-                throw new Exception("Device Reboot failed: " + response);
+            if (!response.contains("OK") && this.logger.isErrorEnabled()){
+                this.logger.error("Device Reboot failed with response from device: " + response);
             }
         }
     }
 
     @Override
     public void controlProperties(List<ControllableProperty> list) throws Exception {
-        list.stream().forEach(p -> {
+        list.forEach(p -> {
             try {
                 controlProperty(p);
             } catch (Exception ignored) {}
